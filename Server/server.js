@@ -6,31 +6,17 @@ require('dotenv').config();
 const fileRoutes = require('./routes/booksRoutes'); 
 const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
-app.use(cors({ origin: 'http://localhost:3001', // your frontend origin 
-methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-allowedHeaders: 'Content-Type, Authorization', }));
-
 const app = express();
-app.get('/', (req, res) => { res.send('Hello, World!'); });
+
+app.get('/', (req, res) => { res.send('Working'); });
 // Middleware
+app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:3001', // Allow requests from this origin
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
 
 
-// Manually add CORS headers
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
-// filepath: /c:/Users/saini/Desktop/ILmKosh/Server/server.js
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
-});
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
