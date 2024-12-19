@@ -13,6 +13,13 @@ methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 credentials: true, 
 allowedHeaders: 'Content-Type, Authorization' }));
 
+app.options('*', cors({
+  origin: 'https://ilm-kosh.netlify.app',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type, Authorization'
+}));
+
+
 app.get('/', (req, res) => { res.send('Working'); });
 // Middleware
 app.use(express.json());
