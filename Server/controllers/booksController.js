@@ -1,11 +1,13 @@
 const asyncHandler = require('express-async-handler');
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const File = require('../models/fileModels'); 
 
 
 const storage = multer.diskStorage({
     destination: (_req, file, cb) => {
-        cb(null, '/uploads/'); 
+        cb(null, './tmp'); 
     },
     filename: (_req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
@@ -16,32 +18,33 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-const UploadBook = asyncHandler ( async (req, res) => {
-    const { title, description } = req.body;
-    const file = req.file;
-    //console.log('POST request received at /uploads');
-    // console.log(req.body); 
-    // console.log(req.file); 
+const UploadBook = asyncHandler(async (req, res) => {
+    upload.single('file')(req, res, async (err) => {
+        if (err) {
+            console.error('Error uploading file:', err);
+            return res.status(500).json({ message: 'Error uploading file.', error: err });
+        }
 
-    if (!file) {
-        return res.status(400).send('No file uploaded.');
-    }
+        const { title, description } = req.body;
+        const file = req.file;
 
-    try {
-        
-        const newFile = new File({
-            title,
-            description,
-            filename: file.filename,
-            filepath: file.path,
+        if (!file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const tempPath = file.path;
+        const targetPath = path.join('./tmp', `${Date.now()}-${file.originalname}`);
+
+        fs.rename(tempPath, targetPath, err => {
+            if (err) {
+                console.error('Error moving file:', err);
+                return res.status(500).json({ message: 'Error moving file', error: err });
+            }
+            res.status(200).json({ message: 'File uploaded successfully', path: targetPath });
         });
-
-        await newFile.save();
-        res.status(200).json({ message: 'File uploaded successfully.', file: newFile });
-    } catch (error) {
-        res.status(500).json({ message: 'Error saving file metadata.', error });
-    }
+    });
 });
+
 const Allbooks = asyncHandler(async (_req, res) => {
     const files = await File.find();
     res.status(200).json({ files });

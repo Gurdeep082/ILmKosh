@@ -10,7 +10,7 @@ const UploadBook = () => {
       setFile(event.target.files[0]);
     };
   
-    const handleUpload = async (event) => {
+    const handleSubmit = async (event) => {
       event.preventDefault();
   
       if (!file) {
@@ -38,10 +38,11 @@ const UploadBook = () => {
         console.log('FormData:', formData);
         const response = await axios.post(apiUrl, formData, config);
   
-        setMessage(response.data.message);
+        setMessage('File uploaded successfully!');
+        console.log('File uploaded successfully!', response.data);
       } catch (error) {
-        console.error('Error uploading file:', error);
-        setMessage('Error uploading file.');
+        console.error('There was an error uploading the file!', error);
+        setMessage('There was an error uploading the file!');
       }
     };
 
@@ -144,7 +145,7 @@ const UploadBook = () => {
 
             <div className="upload-book-container">
                 <h2>Upload Your Book</h2>
-                <form onSubmit={handleUpload}>
+                <form onSubmit={handleSubmit}>
                     <input
                         type="text"
                         placeholder="Title"
