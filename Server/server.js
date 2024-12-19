@@ -8,6 +8,7 @@ const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
 const app = express();
 
+app.get('/', (req, res) => { res.send('Working'); });
 // Middleware
 app.use(express.json());
 app.use(cors({
