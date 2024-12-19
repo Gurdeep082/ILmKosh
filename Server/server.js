@@ -8,8 +8,18 @@ const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
 const app = express();
 
-app.use(cors());
-;
+const allowedOrigins = ["https://ilm-kosh.netlify.app", "http://localhost:3000"];
+ 
+// Enable CORS for specific origins
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
 
 
 app.get('/', (req, res) => { res.send('Working'); });
