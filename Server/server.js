@@ -6,14 +6,14 @@ require('dotenv').config();
 const fileRoutes = require('./routes/booksRoutes'); 
 const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
+app.use(cors({ origin: 'http://localhost:3001', // your frontend origin 
+methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+allowedHeaders: 'Content-Type, Authorization', }));
+
 const app = express();
 app.get('/', (req, res) => { res.send('Hello, World!'); });
 // Middleware
-app.use(express.json());
-app.use(cors({
-    origin: 'http://localhost:3001', // Allow requests from this origin
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-}));
+
 
 // Manually add CORS headers
 app.use((req, res, next) => {
