@@ -10,7 +10,7 @@ const UploadBook = () => {
       setFile(event.target.files[0]);
     };
   
-    const handleSubmit = async (event) => {
+    const handleUpload = async (event) => {
       event.preventDefault();
   
       if (!file) {
@@ -33,16 +33,15 @@ const UploadBook = () => {
       formData.append('description', description);
   
       try {
-        const apiUrl = 'https://i-lm-kosh-9hx7ucvbf-gurdeeps-projects-f026c14f.vercel.app/books/upload';
+        const apiUrl = 'https://ilmkoshserver.onrender.com/books/upload';
         console.log(`Uploading to: ${apiUrl}`);
         console.log('FormData:', formData);
         const response = await axios.post(apiUrl, formData, config);
   
-        setMessage('File uploaded successfully!');
-        console.log('File uploaded successfully!', response.data);
+        setMessage(response.data.message);
       } catch (error) {
-        console.error('There was an error uploading the file!', error);
-        setMessage('There was an error uploading the file!');
+        console.error('Error uploading file:', error);
+        setMessage('Error uploading file.');
       }
     };
 
@@ -145,7 +144,7 @@ const UploadBook = () => {
 
             <div className="upload-book-container">
                 <h2>Upload Your Book</h2>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleUpload}>
                     <input
                         type="text"
                         placeholder="Title"

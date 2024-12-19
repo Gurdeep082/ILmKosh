@@ -44,6 +44,7 @@ const Register = asyncHandler(async (req, res) => {
 const Logout = asyncHandler(async (req, res) => {
   try {
     // Invalidate the token or clear the cookie (if using cookies for token storage)
+    res.clearCookie('token'); // Assuming you are using cookies to store the token
     res.status(200).json({ success: true, message: 'Logout successful!' });
   } catch (err) {
     console.error('Logout error:', err.message);
@@ -52,7 +53,7 @@ const Logout = asyncHandler(async (req, res) => {
 });
 
 // Handle user login
-const Login = asyncHandler(async (req, res) => {
+const Login = async (req, res) => {
   const { email, password } = req.body;
 
   // Validate input
@@ -71,8 +72,8 @@ const Login = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true, token, message: 'Login successful!' });
   } catch (err) {
     console.error('Login error:', err.message);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error', error: err.message });
   }
-});
+};
 
-module.exports = { Register, Login,Logout };
+module.exports = { Register, Login, Logout };

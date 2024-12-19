@@ -7,6 +7,8 @@ const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
 const app = express();
 
+app.get('/', (req, res) => { res.send('Working'); });
+
 const allowedOrigins = ["https://ilm-kosh.netlify.app", "http://localhost:3000", "http://localhost:3001"];
 
 // Middleware
