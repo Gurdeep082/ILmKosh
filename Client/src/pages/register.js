@@ -20,7 +20,7 @@ const Register = () => {
   
     console.log('Sending data:', data); // Log data to ensure it’s correct
   
-    axios.post('https://i-lm-kosh-89a1yuku5-gurdeeps-projects-f026c14f.vercel.app/user/register', data)
+    axios.post('https://i-lm-kosh-9hx7ucvbf-gurdeeps-projects-f026c14f.vercel.app/user/register', data)
       .then((response) => {
         setMessage('Registration successful!');
         console.log('Registration successful!');
