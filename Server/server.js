@@ -8,16 +8,8 @@ const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
 const app = express();
 
-app.use(cors({ origin: ['http://localhost:3001', 'https://ilm-kosh.netlify.app'], 
-methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-credentials: true, 
-allowedHeaders: 'Content-Type, Authorization' }));
-
-app.options('*', cors({
-  origin: 'https://ilm-kosh.netlify.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: 'Content-Type, Authorization'
-}));
+app.use(cors());
+;
 
 
 app.get('/', (req, res) => { res.send('Working'); });
