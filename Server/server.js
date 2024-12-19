@@ -8,13 +8,15 @@ const authRoutes = require('./routes/userRoutes'); // Import auth routes
 
 const app = express();
 
+app.use(cors({ origin: ['http://localhost:3001', 'https://ilm-kosh.netlify.app'], 
+methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+credentials: true, 
+allowedHeaders: 'Content-Type, Authorization' }));
+
 app.get('/', (req, res) => { res.send('Working'); });
 // Middleware
 app.use(express.json());
-app.use(cors({
-    origin: 'http://localhost:3001', // Allow requests from this origin
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-}));
+
 
 
 // Connect to MongoDB

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import fetch from 'isomorphic-fetch';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -20,19 +20,29 @@ const Register = () => {
   
     console.log('Sending data:', data); // Log data to ensure it’s correct
   
-    axios.post('https://i-lm-kosh-9hx7ucvbf-gurdeeps-projects-f026c14f.vercel.app/user/register', data)
-      .then((response) => {
-        setMessage('Registration successful!');
-        console.log('Registration successful!');
-        console.log('User Entered Values:', data);
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', (response.data.user));
+    fetch('https://i-lm-kosh-9hx7ucvbf-gurdeeps-projects-f026c14f.vercel.app/user/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.token) {
+          setMessage('Registration successful!');
+          console.log('Registration successful!');
+          console.log('User Entered Values:', data);
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
           navigate('/new');
-          window.location.reload();  // Adjust the rout30e to correct path
-         // 2-second delay
+          window.location.reload();  // Adjust the route to correct path
+        } else {
+          throw new Error(data.message || 'There was an error registering. Please try again.');
+        }
       })
       .catch(error => {
-        const errorMessage = error.response?.data?.message || 'There was an error registering. Please try again.';
+        const errorMessage = error.message || 'There was an error registering. Please try again.';
         setMessage(errorMessage);
         console.error('There was an error registering!', error);
       });

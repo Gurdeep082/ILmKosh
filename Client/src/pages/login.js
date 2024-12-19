@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import fetch from 'isomorphic-fetch';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -12,30 +12,31 @@ function Login() {
     event.preventDefault();
   
     try {
-      // Make a POST request to the /login endpoint
-      const response = await axios.post('https://i-lm-kosh-9hx7ucvbf-gurdeeps-projects-f026c14f.vercel.app/user/login', {
-        email,
-        password,
+      const response = await fetch('https://i-lm-kosh-9hx7ucvbf-gurdeeps-projects-f026c14f.vercel.app/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
   
-      if (response.data.success) {
-        console.log('Login successful:', response.data); // Debugging
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', (response.data.user));
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log('Login successful:', data); // Debugging
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         navigate('/new');
         window.location.reload(); 
-   
-         // Redirect after successful login
       } else {
-        console.log('Login failed:', response.data.message); // Debugging
-        setError(response.data.message || 'Invalid email or password');
+        console.log('Login failed:', data.message); // Debugging
+        setError(data.message || 'Invalid email or password');
       }
     } catch (err) {
-      console.error('Login error:', err.response?.data || err.message); // Debugging
+      console.error('Login error:', err.message); // Debugging
       setError('Error logging in. Please try again.');
     }
   };
-  
 
   return (
     <>
