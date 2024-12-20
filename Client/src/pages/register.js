@@ -13,12 +13,12 @@ const Register = () => {
     event.preventDefault();
   
     const data = {
-      name,
-      email,
-      password,
+      name: name,
+      email: email,
+      password: password,
     };
   
-    console.log('Sending data:', data);
+    console.log('Sending data:', data); // Log data to ensure it’s correct
   
     axios.post('https://ilmkoshserver.onrender.com/user/register', data)
       .then((response) => {
@@ -26,9 +26,10 @@ const Register = () => {
         console.log('Registration successful!');
         console.log('User Entered Values:', data);
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/new'); // Adjust the route to the correct path
-        window.location.reload();
+        localStorage.setItem('user', (response.data.user));
+          navigate('/new');
+          window.location.reload();  // Adjust the route to correct path
+         // 2-second delay
       })
       .catch(error => {
         const errorMessage = error.response?.data?.message || 'There was an error registering. Please try again.';
@@ -36,7 +37,7 @@ const Register = () => {
         console.error('There was an error registering!', error);
       });
   };
-  
+
   return (
     <div >
       <style>

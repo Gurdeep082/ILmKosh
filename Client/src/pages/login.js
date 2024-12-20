@@ -21,7 +21,7 @@ function Login() {
       if (response.data.success) {
         console.log('Login successful:', response.data); // Debugging
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('user', (response.data.user));
         navigate('/new');
         window.location.reload(); 
    
@@ -32,7 +32,7 @@ function Login() {
       }
     } catch (err) {
       console.error('Login error:', err.response?.data || err.message); // Debugging
-      setError('Network Error');
+      setError('Error logging in. Please try again.');
     }
   };
   
