@@ -2,13 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const fileRoutes = require('./routes/booksRoutes');
-const authRoutes = require('./routes/userRoutes');
+const fileRoutes = require('./routes/booksRoutes'); 
+
 
 const app = express();
 
 app.get('/', (req, res) => { res.send('Working'); });
-
+// Middleware
 const allowedOrigins = ["https://ilm-kosh.netlify.app", "http://localhost:3000", "http://localhost:3001"];
 
 // Middleware
@@ -37,32 +37,18 @@ app.options('*', cors({
 }));
 
 // Connect to MongoDB
-
-const mongoURI = 'mongodb+srv://Gurdeep082:Gurdeep082@cluster0.tejpu.mongodb.net/ILmKosh?retryWrites=true&w=majority&appName=Cluster0';
-
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => {
-        console.error('MongoDB connection error:', err.message);
-        process.exit(1); // Exit the process if there's a connection error
-    });
-
-mongoose.connection.on('error', err => {
-    console.error('MongoDB runtime error:', err.message);
-});
-
-
+console.log('Connecting to MongoDB with URI:', process.env.MONGO_URI);
+mongoose.set('debug', true); // Enable mongoose debug mode
+ mongoose.connect(process.env.MONGO_URI)
+ .then(() => console.log('MongoDB connected'))
+ .catch(err => { console.error('MongoDB connection error:', err.message);
+  process.exit(1); // Exit the process if there's a connection error 
+  });
 
 // Routes
-app.use('/user', authRoutes);
+const authRoutes = require('./routes/userRoutes'); // Import auth routes
+app.use('/user', authRoutes); // Use auth routes
 app.use('/books', fileRoutes);
-
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!' });
-});
-
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
