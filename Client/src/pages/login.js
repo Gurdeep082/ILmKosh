@@ -21,7 +21,7 @@ function Login() {
       if (response.data.success) {
         console.log('Login successful:', response.data); // Debugging
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', (response.data.user));
+        localStorage.setItem('user', true);
         navigate('/new');
         window.location.reload(); 
    

@@ -15,6 +15,7 @@ import Poetry from './pages/bookshelf/genres/poetry';
 import New from './new';
 import UploadBook from './pages/UploadBook';
 import Login from './pages/login';
+import { ProtectedRoute, Protected } from './components/ProtectedRoute';
 
 
 function App() {
@@ -24,9 +25,9 @@ function App() {
       <div className='mainDiv'>
         <Routes>
           <Route path="/" element={<Hero />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/upload" element={<UploadBook />} />
+          <Route path="/register" element={<ProtectedRoute><Register /></ProtectedRoute>} />
+          <Route path="/login" element={<ProtectedRoute><Login /></ProtectedRoute>} />
+          <Route path="/upload" element={<Protected><UploadBook /></Protected>} />
           <Route path="/bookshelf" element={<Bookshelf />} />
           <Route path="/genre/fiction" element={<Fiction />} />
           <Route path="/genre/mystery" element={<Mystery />} />

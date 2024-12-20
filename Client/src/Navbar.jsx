@@ -25,6 +25,7 @@ const Navbar = () => {
      const handleLogout = () => {
          // Logic for logging out the user
          localStorage.removeItem('user');
+         localStorage.removeItem('token'); // Remove token from local storage
          setTimeout(() => {
           setIsAuthenticated(false);
 
