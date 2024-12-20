@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const fileRoutes = require('./routes/booksRoutes'); 
-const authRoutes = require('./routes/userRoutes'); // Import auth routes
+const fileRoutes = require('./routes/booksRoutes');
+const authRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -21,17 +21,8 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    credentials: true
 }));
-
-// Manually add CORS headers
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
 
 // Handle preflight requests
 app.options('*', (req, res) => {
@@ -43,13 +34,22 @@ app.options('*', (req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 // Routes
-app.use('/user', authRoutes); // Use auth routes
+app.use('/user', authRoutes);
 app.use('/books', fileRoutes);
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something went wrong!' });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
