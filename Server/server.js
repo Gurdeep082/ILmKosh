@@ -37,12 +37,21 @@ app.options('*', cors({
 }));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+
+const mongoURI = 'mongodb+srv://Gurdeep082:Gurdeep082@cluster0.tejpu.mongodb.net/ILmKosh?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => {
+        console.error('MongoDB connection error:', err.message);
+        process.exit(1); // Exit the process if there's a connection error
+    });
+
+mongoose.connection.on('error', err => {
+    console.error('MongoDB runtime error:', err.message);
+});
+
+
 
 // Routes
 app.use('/user', authRoutes);

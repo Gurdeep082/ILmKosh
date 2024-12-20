@@ -40,6 +40,7 @@ const Register = asyncHandler(async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 });
+
 // Handle user logout
 const Logout = asyncHandler(async (req, res) => {
   try {
