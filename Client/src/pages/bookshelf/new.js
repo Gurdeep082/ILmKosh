@@ -13,7 +13,7 @@ const genres = [
   { name: 'Poetry', color: '#E97451', urdu: 'شاعری' },
 ];
 
-const Ilmkosh = () => {
+const New = () => {
   const [hoveredBook, setHoveredBook] = useState(null);
   const navigate = useNavigate(); // Initialize useNavigate
   const [setData]=useState([]);
@@ -61,4 +61,4 @@ const Ilmkosh = () => {
   );
 };
 
-export default Ilmkosh;
+export default New;
