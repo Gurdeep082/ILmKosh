@@ -1,48 +1,51 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+
 const UploadBook = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [file, setFile] = useState(null);
+    const [bookType, setBookType] = useState('');
     const [message, setMessage] = useState('');
-  
+
     const handleFileChange = (event) => {
-      setFile(event.target.files[0]);
+        setFile(event.target.files[0]);
     };
-  
+
     const handleUpload = async (event) => {
-      event.preventDefault();
-  
-      if (!file) {
-        setMessage('Please select a file to upload.');
-        return;
-      }
-  
-      const token = localStorage.getItem('token');
-  
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      };
-  
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', title);
-      formData.append('description', description);
-  
-      try {
-        const apiUrl = 'https://ilmkoshserver.onrender.com/books/upload';
-        console.log(`Uploading to: ${apiUrl}`);
-        console.log('FormData:', formData);
-        const response = await axios.post(apiUrl, formData, config);
-  
-        setMessage(response.data.message);
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        setMessage('Error uploading file.');
-      }
+        event.preventDefault();
+
+        if (!file) {
+            setMessage('Please select a file to upload.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('bookType', bookType);
+
+        try {
+            const apiUrl = 'https://ilmkoshserver.onrender.com/books/upload';
+            console.log(`Uploading to: ${apiUrl}`);
+            console.log('FormData:', formData);
+            const response = await axios.post(apiUrl, formData, config);
+
+            setMessage(response.data.message);
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            setMessage('Error uploading file.');
+        }
     };
 
     return (
@@ -79,7 +82,8 @@ const UploadBook = () => {
 
                     .upload-book-container input[type="text"],
                     .upload-book-container textarea,
-                    .upload-book-container input[type="file"] {
+                    .upload-book-container input[type="file"],
+                    .upload-book-container select {
                         padding: 12px;
                         margin: 0;
                         background-color: #efebde;
@@ -96,7 +100,8 @@ const UploadBook = () => {
 
                     .upload-book-container input[type="text"]:focus,
                     .upload-book-container textarea:focus,
-                    .upload-book-container input[type="file"]:focus {
+                    .upload-book-container input[type="file"]:focus,
+                    .upload-book-container select:focus {
                         background-color: #efebde;
                         border-color: #3E2723;
                         outline: none;
@@ -132,8 +137,6 @@ const UploadBook = () => {
                         text-align: center;
                     }
 
-
-
                     /* Align labels properly above input fields */
                     .upload-book-container input[type="text"],
                     .upload-book-container textarea {
@@ -157,6 +160,21 @@ const UploadBook = () => {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     ></textarea>
+                    <select
+                        value={bookType}
+                        onChange={(e) => setBookType(e.target.value)}
+                        required
+                    >
+                        <option value="">Select Book Type</option>
+                        <option value="mystery">Mystery</option>
+                        <option value="sci-fi">Sci-Fi</option>
+                        <option value="biography">Biography</option>
+                        <option value="poetry">Poetry</option>
+                        <option value="history">History</option>
+                        <option value="fiction">Fiction</option>
+                        <option value="philosophy">Philosophy</option>
+                        <option value="romance">Romance</option>
+                    </select>
                     <input type="file" accept=".pdf" onChange={handleFileChange} required />
                     <button type="submit">Upload</button>
                 </form>

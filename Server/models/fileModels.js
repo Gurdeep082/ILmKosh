@@ -5,6 +5,7 @@ const fileSchema = new mongoose.Schema({
     description: { type: String },
     filename: { type: String, required: true },
     filepath: { type: String, required: true },
+    booktypeooktype: { type: String, required: true },
     uploadedAt: { type: Date, default: Date.now },
 });
 
