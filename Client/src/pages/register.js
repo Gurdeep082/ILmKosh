@@ -27,7 +27,7 @@ const Register = () => {
         console.log('User Entered Values:', data);
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', (response.data.user));
-          navigate('/new');
+          navigate('/');
           window.location.reload();  // Adjust the route to correct path
          // 2-second delay
       })

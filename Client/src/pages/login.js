@@ -22,7 +22,7 @@ function Login() {
         console.log('Login successful:', response.data); // Debugging
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', true);
-        navigate('/new');
+        navigate('/');
         window.location.reload(); 
    
          // Redirect after successful login

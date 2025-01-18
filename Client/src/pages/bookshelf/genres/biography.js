@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import FlipBook from './flipbook'; // Adjust the import path as necessary
 
-const Romance = () => {
+
+const Biography = () => {
   const [selectedBook, setSelectedBook] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
@@ -10,7 +13,13 @@ const Romance = () => {
       try {
         const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=biography&key=AIzaSyCSvSsw52clyt8ozO8HuXn6u6H7_PwtfOU&maxResults=39`);
         const filteredBooks = response.data.items.filter(book => book.volumeInfo.imageLinks?.thumbnail);
-        setBooks(filteredBooks);
+        // Add a dummy PDF file path for demonstration purposes
+        const booksWithPdf = filteredBooks.map(book => ({
+          ...book,
+          file: './Books/a-rubber-bridge-too-far-obooko.pdf', // Replace with actual PDF file path
+          numPages: 100, // Replace with actual number of pages if available
+        }));
+        setBooks(booksWithPdf);
       } catch (error) { 
         console.error('Error fetching books:', error);
       }
@@ -18,20 +27,15 @@ const Romance = () => {
     fetchBooks();
   }, []);
 
-  const handleReadClick = React.useCallback((book) => {
+  const handleBookClick = (book) => {
     setSelectedBook(book);
-  }, []);
+    setIsPopupOpen(true);
+  };
 
-  const handleClosePopup = React.useCallback(() => {
+  const closePopup = () => {
+    setIsPopupOpen(false);
     setSelectedBook(null);
-  }, []);
-
-  const handleOpenPreview = React.useCallback(() => {
-    if (selectedBook?.volumeInfo?.previewLink) {
-      window.open(selectedBook.volumeInfo.previewLink, '_blank');
-    }
-    setSelectedBook(null);
-  }, [selectedBook]);
+  };
 
   return (
     <div className='Main'>
@@ -98,42 +102,31 @@ const Romance = () => {
             text-overflow: ellipsis;
             width: 200px;
           }
-          .popup-container {
+          
+          .popup {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
+            z-index: 1000; /* Ensure the popup is on top */
           }
           .popup-content {
-            background-color: #fff;
-            border-radius: 10px;
+            background: white;
             padding: 20px;
-            width: 80%;
-            max-width: 600px;
-            max-height: 80%;
-            overflow-y: auto;
+            border-radius: 5px;
             position: relative;
+            z-index: 1001; /* Ensure the content is on top of the overlay */
           }
           .popup-content button {
-            margin-top: 10px;
-            background-color: #D8C3A5;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-          }
-          .popup-content h2 {
-            margin-top: 0;
-          }
-          .popup-content p {
-            font-size: 1.1em;
-            margin-top: 20px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1002; /* Ensure the button is on top of the content */
           }
         `}
       </style>
@@ -143,7 +136,7 @@ const Romance = () => {
       <div className="books-list">
         {books.length > 0 ? (
           books.map((book) => (
-            <div key={book.id} className="book-item">
+            <div key={book.id} className="book-item" onClick={() => handleBookClick(book)}>
               <img
                 src={book.volumeInfo.imageLinks.thumbnail}
                 alt={book.volumeInfo.title}
@@ -153,26 +146,24 @@ const Romance = () => {
                 {book.volumeInfo.title}
               </h3>
               <p className="booktitle">{book.volumeInfo.authors?.join(', ')}</p>
-              <button onClick={() => handleReadClick(book)}>Read</button>
+              <button onClick={() => handleBookClick(book)}>Read</button>
             </div>
           ))
         ) : (
           <p>No books available.</p>
         )}
       </div>
-      {selectedBook && (
-        <div className="popup-container">
+      {isPopupOpen && (
+        <div className="popup">
           <div className="popup-content">
-            <h2>{selectedBook.volumeInfo.title}</h2>
-            <p>{selectedBook.volumeInfo.description || 'No description available.'}</p>
-            <button onClick={handleOpenPreview}>Open Preview in New Tab</button>
-            <button onClick={handleClosePopup}>Close</button>
+            <button onClick={closePopup}>Close</button>
+            <FlipBook book={selectedBook} />
           </div>
         </div>
       )}
     </div>
-    //asdfghj
   );
 }
 
-export default Romance;
+export default Biography;
+

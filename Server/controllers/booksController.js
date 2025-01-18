@@ -2,21 +2,18 @@ const asyncHandler = require('express-async-handler');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const File = require('../models/fileModels'); 
-
+const File = require('../models/fileModels');
 
 const storage = multer.diskStorage({
     destination: (_req, file, cb) => {
-        cb(null, './tmp'); 
+        cb(null, './tmp');
     },
     filename: (_req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     },
 });
 
-
 const upload = multer({ storage });
-
 
 const UploadBook = asyncHandler(async (req, res) => {
     upload.single('file')(req, res, async (err) => {
@@ -35,12 +32,28 @@ const UploadBook = asyncHandler(async (req, res) => {
         const tempPath = file.path;
         const targetPath = path.join('./tmp', `${Date.now()}-${file.originalname}`);
 
-        fs.rename(tempPath, targetPath, err => {
+        fs.rename(tempPath, targetPath, async (err) => {
             if (err) {
                 console.error('Error moving file:', err);
                 return res.status(500).json({ message: 'Error moving file', error: err });
             }
-            res.status(200).json({ message: 'File uploaded successfully', path: targetPath });
+
+            try {
+                const newFile = new File({
+                    title,
+                    description,
+                    filepath: targetPath,
+                    filename: file.originalname,
+                 
+                });
+
+                await newFile.save();
+
+                res.status(200).json({ message: 'File uploaded and saved to database successfully', file: newFile });
+            } catch (dbError) {
+                console.error('Error saving file to database:', dbError);
+                res.status(500).json({ message: 'Error saving file to database', error: dbError });
+            }
         });
     });
 });
