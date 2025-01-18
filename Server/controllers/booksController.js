@@ -44,7 +44,7 @@ const UploadBook = asyncHandler(async (req, res) => {
                     description,
                     filepath: targetPath,
                     filename: file.originalname,
-                    booktype: req.body.bookType,
+                    bookType,
                  
                 });
 
