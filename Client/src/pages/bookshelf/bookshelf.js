@@ -14,28 +14,29 @@ const genres = [
 ];
 
 let Books = [];
+let selectedGenre = '';
 
 const Ilmkosh = () => {
-  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedGenreState, setSelectedGenreState] = useState('');
   const [hoveredBook, setHoveredBook] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (selectedGenre) {
+    if (selectedGenreState) {
       const fetchBooks = async () => {
         try {
-          
-          navigate(`/genre/${selectedGenre}`);
+          navigate(`/genre/${selectedGenreState}`, { state: { genre: selectedGenreState } });
         } catch (error) {
           console.error(error);
         }
       };
       fetchBooks();
     }
-  }, [selectedGenre, navigate]);
+  }, [selectedGenreState, navigate]);
 
   const handleGenreClick = (genre) => {
-    setSelectedGenre(genre);
+    setSelectedGenreState(genre);
+    selectedGenre = genre;
   };
 
   return (
@@ -70,5 +71,7 @@ const Ilmkosh = () => {
   );
 };
 
-export { Books };
+const Genre = () => selectedGenre;
+
+export { Books, Genre };
 export default Ilmkosh;

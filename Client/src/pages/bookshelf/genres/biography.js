@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import FlipBook from './flipbook'; // Adjust the import path as necessary
+import FlipBook from './flipbook';
 
-
-const Biography = () => {
+const Biography = ({ gener }) => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [books, setBooks] = useState([]);
-
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=biography&key=AIzaSyCSvSsw52clyt8ozO8HuXn6u6H7_PwtfOU&maxResults=39`);
+        const response = await axios.get(`http://localhost:5000/books/type/${gener}`);
         const filteredBooks = response.data.items.filter(book => book.volumeInfo.imageLinks?.thumbnail);
         // Add a dummy PDF file path for demonstration purposes
         const booksWithPdf = filteredBooks.map(book => ({
@@ -25,14 +23,14 @@ const Biography = () => {
       }
     };
     fetchBooks();
-  }, []);
+  }, [gener]);
 
-  const handleBookClick = (book) => {
+  const handleReadClick = (book) => {
     setSelectedBook(book);
     setIsPopupOpen(true);
   };
 
-  const closePopup = () => {
+  const handleClosePopup = () => {
     setIsPopupOpen(false);
     setSelectedBook(null);
   };
@@ -63,80 +61,53 @@ const Biography = () => {
           }
           .book-item button {
             border-radius: 10px;
-            border: 2px solid #D8C3A5;
-            background-color: #D8C3A5;
-            padding: 5px 10px;
           }
-          .book-item img {
-            width: auto;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 10px;
-          }
-          .book-item h3 {
-            font-size: 1em;
-            margin-top: 10px;
-          }
-          .book-item p {
-            font-size: 0.9em;
-            color: #666;
-          }
-          @media (min-width: 1200px) {
-            .books-list {
-              grid-template-columns: repeat(6, 1fr);
-            }
-          }
-          @media (min-width: 768px) and (max-width: 1199px) {
-            .books-list {
-              grid-template-columns: repeat(4, 1fr);
-            }
-          }
-          @media (max-width: 767px) {
-            .books-list {
-              grid-template-columns: repeat(3, 1fr);
-            }
-          }
-          .booktitle {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 200px;
-          }
-          
-          .popup {
+          .popup-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000; /* Ensure the popup is on top */
+            z-index: 10;
           }
           .popup-content {
-            background: white;
+            background-color: #fff;
+            border-radius: 10px;
             padding: 20px;
-            border-radius: 5px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow-y: auto;
             position: relative;
-            z-index: 1001; /* Ensure the content is on top of the overlay */
           }
           .popup-content button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1002; /* Ensure the button is on top of the content */
+            margin-top: 10px;
+            background-color: #D8C3A5;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+          }
+          .popup-content h2 {
+            margin-top: 0;
+          }
+          .popup-content p {
+            font-size: 1.1em;
+            margin-top: 20px;
           }
         `}
       </style>
       <h1 style={{ fontFamily: "Italianno, system-ui", color: "#D8C3A5", fontWeight: "550", fontSize: "50px", textAlign: "center" }}>
-        Biography Books
+        Free Books
       </h1>
       <div className="books-list">
         {books.length > 0 ? (
           books.map((book) => (
-            <div key={book.id} className="book-item" onClick={() => handleBookClick(book)}>
+            <div key={book.id} className="book-item">
               <img
                 src={book.volumeInfo.imageLinks.thumbnail}
                 alt={book.volumeInfo.title}
@@ -146,17 +117,19 @@ const Biography = () => {
                 {book.volumeInfo.title}
               </h3>
               <p className="booktitle">{book.volumeInfo.authors?.join(', ')}</p>
-              <button onClick={() => handleBookClick(book)}>Read</button>
+              <button onClick={() => handleReadClick(book)}>Read</button>
             </div>
           ))
         ) : (
           <p>No books available.</p>
         )}
       </div>
-      {isPopupOpen && (
-        <div className="popup">
+      {isPopupOpen && selectedBook && (
+        <div className="popup-container">
           <div className="popup-content">
-            <button onClick={closePopup}>Close</button>
+            <h2>{selectedBook.volumeInfo.title}</h2>
+            <p>{selectedBook.volumeInfo.description || 'No description available.'}</p>
+            <button onClick={handleClosePopup}>Close</button>
             <FlipBook book={selectedBook} />
           </div>
         </div>
@@ -166,4 +139,3 @@ const Biography = () => {
 }
 
 export default Biography;
-

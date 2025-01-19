@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import FlipBook from './pages/bookshelf/genres/flipbook.js'; // Adjust the import path as necessary
 
 const New = () => {
   const [selectedBook, setSelectedBook] = useState(null);
+
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=scifi&key=AIzaSyCSvSsw52clyt8ozO8HuXn6u6H7_PwtfOU&maxResults=39`);
+        const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=biography&filter=free-ebooks&key=AIzaSyCSvSsw52clyt8ozO8HuXn6u6H7_PwtfOU&maxResults=39`);
         const filteredBooks = response.data.items.filter(book => book.volumeInfo.imageLinks?.thumbnail);
-        setBooks(filteredBooks);
+        // Add a dummy PDF file path for demonstration purposes
+        const booksWithPdf = filteredBooks.map(book => ({
+          ...book,
+          file: '/Books/Biography.pdf', // Replace with actual PDF file path
+          numPages: 100, // Replace with actual number of pages if available
+        }));
+        setBooks(booksWithPdf);
       } catch (error) {
         console.error('Error fetching books:', error);
       }
@@ -20,9 +28,11 @@ const New = () => {
 
   const handleReadClick = React.useCallback((book) => {
     setSelectedBook(book);
+    
   }, []);
 
   const handleClosePopup = React.useCallback(() => {
+  
     setSelectedBook(null);
   }, []);
 
@@ -116,12 +126,14 @@ const New = () => {
             padding: 20px;
             width: 80%;
             max-width: 600px;
-            max-height: 80%;
+            max-height: 100%;
             overflow-y: auto;
             position: relative;
           }
-          .popup-content button {
-            margin-top: 10px;
+          .popup-content .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             background-color: #D8C3A5;
             border: none;
             padding: 10px;
@@ -163,10 +175,11 @@ const New = () => {
       {selectedBook && (
         <div className="popup-container">
           <div className="popup-content">
+            <button className="close-button" onClick={handleClosePopup}>Close</button>
             <h2>{selectedBook.volumeInfo.title}</h2>
             <p>{selectedBook.volumeInfo.description || 'No description available.'}</p>
             <button onClick={handleOpenPreview}>Open Preview in New Tab</button>
-            <button onClick={handleClosePopup}>Close</button>
+            <FlipBook book={selectedBook} />
           </div>
         </div>
       )}

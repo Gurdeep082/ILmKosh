@@ -1,15 +1,15 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import HTMLFlipBook from 'react-pageflip';
-import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import pdf from './Books/a-rubber-bridge-too-far-obooko.pdf';
+import './flipbook.module.css'; // Import the CSS file
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+// Configure the PDF.js worker to use the local copy
+pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.min.mjs`;
 
 const Pages = React.forwardRef((props, ref) => {
     return (
-        <div className="demoPage" ref={ref} >
-            <p>{props.children}</p>
+        <div className="demoPage" ref={ref}>
+            <div>{props.children}</div>
             <p>Page number: {props.number}</p>
         </div>
     );
@@ -17,36 +17,71 @@ const Pages = React.forwardRef((props, ref) => {
 
 Pages.displayName = 'Pages';
 
-function Flipbook() {
+const useWindowSize = () => {
+    const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
 
-    const [numPages, setNumPages] = useState();
+    useEffect(() => {
+        const handleResize = () => {
+            setSize([window.innerWidth, window.innerHeight]);
+        };
 
-    function onDocumentLoadSuccess({ numPages }) {
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    return size;
+};
+
+const FlipBook = React.memo(({ book }) => {
+    const [numPages, setNumPages] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [windowWidth, windowHeight] = useWindowSize();
+    const flipbookRef = useRef(null);
+
+    const onDocumentLoadSuccess = useCallback(({ numPages }) => {
         setNumPages(numPages);
-    }
+    }, []);
+
+    const onDocumentLoadError = useCallback((error) => {
+        console.error('Error loading PDF document:', error);
+    }, []);
+
+
+
+    const onPageFlip = useCallback((e) => {
+        setCurrentPage(e.data);  // Update the current page number when flipped
+    }, []);
+
     return (
-        <>
-
-            <div className='h-screen w-screen flex flex-col gap-5 justify-center items-center bg-gray-900 overflow-hidden'>
-                <h1 className='text-3xl text-white text-center font-bold'>FlipBook-</h1>
-                <HTMLFlipBook width={400} height={570}>
-                    {
-                        [...Array(numPages).keys()].map((pNum) => (
-                            <Pages key={pNum} number={pNum + 1}>
-                                <Document file={pdf} onLoadSuccess={onDocumentLoadSuccess}>
-                                    <Page pageNumber={pNum} width={400} renderAnnotationLayer={false} renderTextLayer={false} />
-                                </Document>
-                                <p>
-                                    Page {pNum} of {numPages}
-                                </p>
-                            </Pages>
-                        ))
-                    }
-                </HTMLFlipBook>
-            </div>
-        </>
-
+        <div className="flipbook-container">
+            <HTMLFlipBook
+                className="flipbook"
+                width={Math.min(windowWidth * 0.7, 800)}
+                height={Math.min(windowHeight * 0.7, 600)}
+                onFlip={onPageFlip}
+                ref={flipbookRef}
+                drawShadow={true}
+                perspective={1500}
+                startPage={currentPage - 1} // Start from the current page
+            >
+                {Array.from(new Array(numPages), (el, index) => (
+                    <Pages key={index} number={index + 1}>
+                        {Math.abs(currentPage - (index + 1)) <= 2 && (
+                            <Document
+                                file={book.file}
+                                onLoadSuccess={onDocumentLoadSuccess}
+                                onLoadError={onDocumentLoadError}
+                            >
+                                <Page pageNumber={index + 1} renderTextLayer={false} />
+                            </Document>
+                        )}
+                    </Pages>
+                ))}
+            </HTMLFlipBook>
+        </div>
     );
-}
+});
 
-export default Flipbook
+export default FlipBook;
