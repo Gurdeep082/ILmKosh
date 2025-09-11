@@ -54,7 +54,7 @@ const Logout = asyncHandler(async (req, res) => {
 });
 
 // Handle user login
-const Login = async (req, res) => {
+const Login =asyncHandler (async (req, res) => {
   const { email, password } = req.body;
 
   // Validate input
@@ -75,6 +75,6 @@ const Login = async (req, res) => {
     console.error('Login error:', err.message);
     res.status(500).json({ success: false, message: 'Server error', error: err.message });
   }
-};
+});
 
 module.exports = { Register, Login, Logout };
